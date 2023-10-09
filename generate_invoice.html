@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        .header {
+            text-align: left;
+            margin-left: 20px; /* Add some left margin for centering to the left */
+        }
+        .bir-tin {
+            text-align: left;
+			margin-left: 20px; /* Add some left margin for centering to the left */
+        }
+        .date-time {
+            text-align: left;
+			margin-left: 20px; /* Add some left margin for centering to the left */
+        }
+        .items {
+            text-align: left; /* Center-align Invoice Items to the left */
+            margin-left: 20px; /* Add some left margin for centering to the left */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>BrandX Grocery Sales Invoice</h1>
+    </div>
+    <div class="bir-tin">
+        <p>BIR TIN: 23433444</p>
+    </div>
+    <div class="date-time">
+        <p>Date and Time: <span id="current-date-time"></span></p>
+    </div>
+
+    <div class="items">
+        <div id="invoice-details">
+            <!-- JavaScript will populate this section -->
+        </div>
+    </div>
+    
+    <button onclick="printInvoice()">Print Invoice</button>
+
+    <script>
+        // Get URL parameters and decode them
+        const urlParams = new URLSearchParams(window.location.search);
+        const items = JSON.parse(decodeURIComponent(urlParams.get('items')));
+        const cashTendered = parseFloat(urlParams.get('cashTendered'));
+        const change = parseFloat(urlParams.get('change'));
+        const totalAmountPaid = parseFloat(urlParams.get('totalAmountPaid'));
+
+        if (items && !isNaN(cashTendered) && !isNaN(change) && !isNaN(totalAmountPaid)) {
+            const invoiceDetailsElement = document.getElementById('invoice-details');
+            invoiceDetailsElement.innerHTML = `
+                <h2>Items:</h2>
+                <ul>
+                    ${items.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+                <p>Cash Tendered: ₱${cashTendered.toFixed(2)}</p>
+                <p>Change: ₱${change.toFixed(2)}</p>
+                <p>Total Amount Paid: ₱${totalAmountPaid.toFixed(2)}</p>
+            `;
+        } else {
+            alert('No invoice details found.');
+        }
+
+        // Get the current date and time
+        const currentDate = new Date();
+        const currentDateTime = currentDate.toLocaleString();
+
+        // Display the current date and time
+        document.getElementById('current-date-time').textContent = currentDateTime;
+
+        function printInvoice() {
+            // Print the invoice
+            window.print();
+        }
+    </script>
+</body>
+</html>
