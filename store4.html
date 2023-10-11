@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Selection and Total Calculator</title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            background-color: #5e9b5e;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        .item-button {
+            background-color: #3c3c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .item-button:hover {
+            background-color: #5c5c5c;
+        }
+
+        #item-details, #total {
+            background-color: #fff;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+    <script>
+        const products = {
+            "1001": { name: "Item 1", price: 500.00 },
+            "1002": { name: "Item 2", price: 1000.00 },
+            "1003": { name: "Item 3", price: 1500.00 },
+            "1004": { name: "Item 4", price: 2000.00 }
+        };
+
+        let cashOnHand = 0;
+
+        function setCashOnHand() {
+            const cashOnHandInput = document.getElementById('cash-on-hand');
+            cashOnHand = parseFloat(cashOnHandInput.value);
+
+            document.getElementById('cash-on-hand-display').textContent = 'Cash on Hand: ₱' + cashOnHand.toFixed(2);
+        }
+
+        function findItem() {
+            const codeInput = document.getElementById('code');
+            const selectedCode = codeInput.value;
+            const item = products[selectedCode];
+
+            if (item) {
+                const itemDetails = document.getElementById('item-details');
+                itemDetails.innerHTML = `
+                    <p>${item.name} - ₱${(item.price).toFixed(2)}</p>
+                    <label for="quantity">Quantity: </label>
+                    <input type="number" id="quantity" value="1" min="1">
+                `;
+
+                const addItemButton = document.getElementById('add-item-button');
+                addItemButton.style.display = 'block';
+                addItemButton.onclick = function() {
+                    addItem(item);
+                };
+            } else {
+                document.getElementById('item-details').innerHTML = '<p>No item found. Please enter a correct code.</p>';
+            }
+        }
+
+        function addItem(item) {
+            const itemList = document.getElementById('item-list');
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const listItem = document.createElement('li');
+            const totalItemPrice = item.price * quantity;
+            listItem.textContent = `${item.name} x${quantity} - ₱${totalItemPrice.toFixed(2)}`;
+            itemList.appendChild(listItem);
+
+            updateTotal();
+        }
+
+        function updateTotal() {
+            let items = document.querySelectorAll('#item-list li');
+            let total = 0;
+
+            items.forEach(function(item) {
+                let parts = item.textContent.split(' - ');
+                let price = parseFloat(parts[1].match(/₱\d+\.\d{2}/)[0].slice(1));
+                total += price;
+            });
+
+            document.getElementById('total').textContent = 'Total Payable: ₱' + total.toFixed(2);
+        }
+
+        function calculateChange() {
+            const cashReceived = parseFloat(document.getElementById('cash-received').value);
+            const totalPayable = parseFloat(document.getElementById('total').textContent.match(/₱\d+\.\d{2}/)[0].slice(1));
+
+            const change = cashReceived - totalPayable;
+            document.getElementById('change').textContent = 'Change: ₱' + change.toFixed(2);
+
+            calculateTotalSales();
+
+            // Open the generate_invoice.html page with invoice details as URL parameters
+            const items = Array.from(document.querySelectorAll('#item-list li')).map(item => item.textContent);
+            const cashTendered = cashReceived;
+            const totalAmountPaid = totalPayable;
+
+            const invoiceDetails = {
+                items,
+                cashTendered,
+                change,
+                totalAmountPaid
+            };
+            const invoiceUrl = `generate_invoice.html?items=${encodeURIComponent(JSON.stringify(items))}&cashTendered=${cashTendered}&change=${change}&totalAmountPaid=${totalAmountPaid}`;
+            window.open(invoiceUrl, '_blank');
+        }
+
+        function calculateTotalSales() {
+            const cashReceived = parseFloat(document.getElementById('cash-received').value);
+            const change = parseFloat(document.getElementById('change').textContent.match(/        const totalSales = cashOnHand + cashReceived - change;
+        document.getElementById('total-sales').textContent = 'Total Sales: ₱' + totalSales.toFixed(2);
+    }
+
+    function updateCashOnHand() {
+        const totalSales = parseFloat(document.getElementById('total-sales').textContent.match(/₱\d+\.\d{2}/)[0].slice(1));
+        cashOnHand = totalSales;
+
+        document.getElementById('cash-on-hand').value = cashOnHand.toFixed(2);
+        document.getElementById('cash-on-hand-display').textContent = 'Cash on Hand: ₱' + cashOnHand.toFixed(2);
+    }
+</script>
+</head>
+<body>
+    <h1>Welcome to BrandX Grocery BIR TIN 12345534</h1>
+
+<div class="container">
+    <label for="cash-on-hand">Cash on Hand at Start of Sales Day (₱): </label>
+    <input type="number" id="cash-on-hand" step="0.01">
+    <button class="item-button" onclick="setCashOnHand()">Set Cash on Hand</button>
+</div>
+<div id="cash-on-hand-display">Cash on Hand: ₱0.00</div>
+
+<div class="container">
+    <label for="code">Enter 4-Digit Code: </label>
+    <input type="text" id="code" maxlength="4">
+    <button class="item-button" onclick="findItem()">Find Item</button>
+</div>
+
+<div id="item-details"></div>
+<button class="item-button" id="add-item-button" style="display: none;">Add Item to Cart</button>
+
+<ul id="item-list"></ul>
+
+<div id="total">Total Payable: ₱0.00</div>
+
+<div class="container">
+    <label for="cash-received">Cash Received (₱): </label>
+    <input type="number" id="cash-received" step="0.01">
+    <button class="item-button" onclick="calculateChange()">Calculate Change</button>
+</div>
+
+<div id="change">Change: ₱0.00</div>
+<div id="total-sales">Total Sales: ₱0.00</div>
+
+<div class="container">
+    <button class="item-button" onclick="updateCashOnHand()">Update Cash on Hand with Total Sales</button>
+</div>
+
+</body>
+</html>
+```
+
