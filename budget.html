@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Tracker</title>
+</head>
+<body>
+    <h1>Expense Tracker</h1>
+    
+    <form id="expense-form">
+        <label for="expense-name">Expense Name:</label>
+        <input type="text" id="expense-name">
+        <label for="expense-amount">Expense Amount (in PHP):</label>
+        <input type="number" id="expense-amount" step="0.01">
+        <label for="expense-date">Date:</label>
+        <input type="date" id="expense-date">
+        <button type="button" id="add-expense">Add Expense</button>
+    </form>
+    
+    <p>Total Expenses for the Week (in PHP): <span id="total-expenses">₱0.00</span></p>
+
+    <h2>Expense List</h2>
+    <ul id="expense-list"></ul>
+
+    <button type="button" id="clear-all">Clear All</button>
+    <button type="button" id="export-data">Export Data</button>
+    <button type="button" id="generate-list">Generate Expenses List</button>
+    <input type="file" id="import-data">
+
+    <script>
+        // Function to calculate and display the total expenses in PHP
+        function updateTotalExpenses() {
+            let totalExpenses = 0;
+            const expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
+            expenses.forEach(function(expense) {
+                totalExpenses += parseFloat(expense.amount);
+            });
+            document.getElementById("total-expenses").textContent = `₱${totalExpenses.toFixed(2)}`;
+        }
+
+        // Function to update the expense list
+        function updateExpenseList() {
+            const expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
+            const expenseList = document.getElementById("expense-list");
+            expenseList.innerHTML = "";
+            expenses.forEach(function(expense, index) {
+                const listItem = document.createElement("li");
+                const date = new Date(expense.date).toLocaleDateString();
+                listItem.textContent = `${expense.name}: ₱${expense.amount.toFixed(2)} (Date: ${date})`;
+                const editButton = document.createElement("button");
+                editButton.textContent = "Edit";
+                editButton.addEventListener("click", function() {
+                    const newName = prompt("Enter new name:", expense.name);
+                    const newAmount = prompt("Enter new amount (in PHP):", expense.amount);
+                    if (newName !== null && newAmount !== null) {
+                        expense.name = newName;
+                        expense.amount = parseFloat(newAmount);
+                        updateExpenseList();
+                        updateTotalExpenses();
+                        localStorage.setItem("expenses", JSON.stringify(expenses));
+                    }
+                });
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.addEventListener("click", function() {
+                    expenses.splice(index, 1);
+                    updateExpenseList();
+                    updateTotalExpenses();
+                    localStorage.setItem("expenses", JSON.stringify(expenses));
+                });
+                listItem.appendChild(editButton);
+                listItem.appendChild(deleteButton);
+                expenseList.appendChild(listItem);
+            });
+        }
+
+        // Event handler for adding expenses
+        document.getElementById("add-expense").addEventListener("click", function() {
+            const expenseName = document.getElementById("expense-name").value;
+            const expenseAmountPHP = parseFloat(document.getElementById("expense-amount").value);
+            const expenseDate = document.getElementById("expense-date").value;
+
+            if (!expenseName || isNaN(expenseAmountPHP) || !expenseDate) {
+                alert("Please enter the expense name, amount, and date.");
+                return;
+            }
+
+            // Retrieve existing expenses from local storage
+            const expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
+
+            // Add the new expense
+            expenses.push({ name: expenseName, amount: expenseAmountPHP, date: expenseDate });
+
+            // Save the updated expenses back to local storage
+            localStorage.setItem("expenses", JSON.stringify(expenses));
+
+            // Update the total expenses display and expense list
+            updateTotalExpenses();
+            updateExpenseList();
+
+            // Clear the input fields and set the date input to today's date
+            document.getElementById("expense-name").value = "";
+            document.getElementById("expense-amount").value = "";
+            document.getElementById("expense-date").valueAsDate = new Date();
+        });
+
+        // Event handler for clearing all expenses
+        document.getElementById("clear-all").addEventListener("click", function() {
+            if (confirm("Are you sure you want to clear all expenses?")) {
+                localStorage.removeItem("expenses");
+                updateTotalExpenses();
+                updateExpenseList();
+            }
+        });
+
+        // Event handler for exporting data
+        document.getElementById("export-data").addEventListener("click", function() {
+            const expenses = localStorage.getItem("expenses");
+            if (expenses) {
+                const blob = new Blob([expenses], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "expenses.json";
+                a.click();
+            } else {
+                alert("No data to export.");
+            }
+        });
+
+        // Event handler for generating expenses list
+        document.getElementById("generate-list").addEventListener("click", function() {
+            const expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
+            const listWindow = window.open("", "Expenses List", "width=600,height=400");
+            const listContent = `
+                <html>
+                <head>
+                    <title>Expenses List</title>
+                </head>
+                <body>
+                    <h2>Expenses List</h2>
+                    <ul>
+                        ${expenses.map(expense => {
+                            const date = new Date(expense.date).toLocaleDateString();
+                            return `<li>${expense.name}: ₱${expense.amount.toFixed(2)} (Date: ${date})</li>`;
+                        }).join("")}
+                    </ul>
+                </body>
+                </html>
+            `;
+            listWindow.document.open();
+            listWindow.document.write(listContent);
+            listWindow.document.close();
+            listWindow.document.title = "Expenses List";
+            listWindow.document.head.innerHTML = `
+                <title>Expenses List</title>
+            `;
+            listWindow.document.body.innerHTML = `
+                <h2>Expenses List</h2>
+                <ul>
+                    ${expenses.map(expense => {
+                        const date = new Date(expense.date).toLocaleDateString();
+                        return `<li>${expense.name}: ₱${expense.amount.toFixed(2)} (Date: ${date})</li>`;
+                    }).join("")}
+                </ul>
+                <button type="button" onclick="window.print()">Print</button>
+            `;
+        });
+
+        // Initialize the total expenses display and expense list
+        updateTotalExpenses();
+        updateExpenseList();
+
+        // Set the date input to today's date
+        document.getElementById("expense-date").valueAsDate = new Date();
+    </script>
+</body>
+</html>
