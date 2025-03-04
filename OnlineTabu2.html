@@ -34,14 +34,31 @@
         }
 
         function sendPixelEvent() {
-            const name = document.getElementById('customer-name').value;
-            const phone = document.getElementById('customer-phone').value;
-            const email = document.getElementById('customer-email').value;
-            
-            if (!name || !phone || !email) {
-                alert("Please fill out all fields.");
-                return;
-            }
+    if (typeof fbq !== "function") {
+        console.error("Meta Pixel (fbq) is not defined. Make sure the script is loaded.");
+        alert("Meta Pixel is not loaded. Please refresh the page.");
+        return;
+    }
+
+    const name = document.getElementById('customer-name').value;
+    const phone = document.getElementById('customer-phone').value;
+    const email = document.getElementById('customer-email').value;
+
+    if (!name || !phone || !email) {
+        alert("Please fill out all fields.");
+        return;
+    }
+
+    const eventData = {
+        event: "CustomerRegistration",
+        name: name,
+        phone: phone,
+        email: email
+    };
+
+    fbq('trackCustom', 'CustomerEvent', eventData);
+    alert('Customer data sent to Facebook Pixel!');
+}
             
             const eventData = {
                 event: "CustomerRegistration",
@@ -65,7 +82,7 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1330985368233475');
+    fbq('init', '3931969760411310');
     fbq('track', 'PageView');
     </script>
     <noscript><img height="1" width="1" style="display:none"
@@ -84,9 +101,9 @@
       s.parentNode.insertBefore(t,s)}(window, document,'script',
       'https://dn1ktoeflrkj1.cloudfront.net/sdk/5418180047227141104/events.js');
       cbq('setHost', 'https://rpsa767kpp.us-west-2.awsapprunner.com/');
-      cbq('init', '3651416750476072988');
-      cbq('setMetadata', '625653913601966');
-      cbq('set', 'cookieDomain', 'https://ytancodes.github.io/Grocery/OnlineTabu2.html');
+      cbq('init', '3931969760411310');
+      cbq('setMetadata', '625653913601966'); // Updated Meta Dataset;
+      cbq('set', 'cookieDomain', 'https://ytancodes.github.io/Grocery/OnlineTabu.html');
       cbq('track', 'PageView');
     </script>
     <!-- End Signals Gateway Pixel Code -->
