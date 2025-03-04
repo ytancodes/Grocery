@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posters for Kids</title>
+    <title>Item Selection and Total Calculator</title>
     <script>
         const products = {
-            "P001": { name: "Poster 1", price: 500.00 },
-            "P002": { name: "Poster 2", price: 1000.00 },
-            "P003": { name: "Poster 3", price: 1500.00 },
-            "P004": { name: "Poster 4", price: 2000.00 }
+            "1001": { name: "Item 1", price: 500.00 },
+            "1002": { name: "Item 2", price: 1000.00 },
+            "1003": { name: "Item 3", price: 1500.00 },
+            "1004": { name: "Item 4", price: 2000.00 }
         };
 
         let total = 0;
@@ -28,33 +28,30 @@
                 document.getElementById('item-list').appendChild(listItem);
                 
                 document.getElementById('total').textContent = `Total: ₱${total.toFixed(2)}`;
-                
-                // Track AddToCart event
-                cbq('track', 'AddToCart', {
-                    content_name: item.name,
-                    content_category: 'Posters for Kids',
-                    content_ids: [code],
-                    currency: 'PHP',
-                    value: cost
-                });
             } else {
                 alert("Invalid item code.");
             }
         }
 
-        function initiateCheckout() {
-            cbq('track', 'InitiateCheckout', {
-                currency: 'PHP',
-                value: total
-            });
-            alert("Checkout started!");
-        }
-
-        function favoriteItem() {
-            cbq('trackCustom', 'Favorite', {
-                content_category: 'Posters for Kids'
-            });
-            alert("Item favorited!");
+        function sendPixelEvent() {
+            const name = document.getElementById('customer-name').value;
+            const phone = document.getElementById('customer-phone').value;
+            const email = document.getElementById('customer-email').value;
+            
+            if (!name || !phone || !email) {
+                alert("Please fill out all fields.");
+                return;
+            }
+            
+            const eventData = {
+                event: "CustomerRegistration",
+                name: name,
+                phone: phone,
+                email: email
+            };
+            
+            fbq('trackCustom', 'CustomerEvent', eventData);
+            alert('Customer data sent to Facebook Pixel!');
         }
     </script>
 
@@ -70,45 +67,37 @@
       'https://dn1ktoeflrkj1.cloudfront.net/sdk/5418180047227141104/events.js');
       cbq('setHost', 'https://rpsa767kpp.us-west-2.awsapprunner.com/');
       cbq('init', '3651416750476072988');
-      cbq('set', 'cookieDomain', 'https://ytancodes.github.io/Grocery/OnlineTabu.html'); // ✅ Force first-party cookies
-      cbq('track', 'PageView');
       cbq('setMetadata', '625653913601966');
+      cbq('track', 'PageView');
     </script>
     <!-- End Signals Gateway Pixel Code -->
-
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1330985368233475');
-    fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1330985368233475&ev=PageView&noscript=1"
-    /></noscript>
-    <!-- End Meta Pixel Code -->
 </head>
 <body>
-    <h1>Posters for Kids</h1>
+    <h1>Welcome to BrandX Grocery</h1>
 
     <h2>Item Selection</h2>
     <label for="item-code">Item Code:</label>
     <input type="text" id="item-code">
     <label for="quantity">Quantity:</label>
     <input type="number" id="quantity" value="1" min="1">
-    <button onclick="addItem()">Add to Cart</button>
-    <button onclick="favoriteItem()">Favorite</button>
+    <button onclick="addItem()">Add Item</button>
     
     <h2>Shopping List</h2>
     <ul id="item-list"></ul>
     <h3 id="total">Total: ₱0.00</h3>
     
-    <button onclick="initiateCheckout()">Proceed to Checkout</button>
+    <h2>Customer Data Sheet</h2>
+    <form id="customer-form">
+        <label for="customer-name">Name:</label>
+        <input type="text" id="customer-name" required><br><br>
+        
+        <label for="customer-phone">Phone Number:</label>
+        <input type="tel" id="customer-phone" required><br><br>
+        
+        <label for="customer-email">Email:</label>
+        <input type="email" id="customer-email" required><br><br>
+        
+        <button type="button" onclick="sendPixelEvent()">Send Customer Event</button>
+    </form>
 </body>
 </html>
