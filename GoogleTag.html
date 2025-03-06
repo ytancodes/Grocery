@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Tag Manager -->
+    <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-WB9RK5VC');
+    </script>
+    <!-- End Google Tag Manager -->
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    
+    fbq('init', '625653913601966'); // ✅ Replace with your actual Meta Pixel ID
+    fbq('track', 'PageView');
+    </script>
+    <noscript>
+        <img height="1" width="1" style="display:none"
+        src="https://www.facebook.com/tr?id=625653913601966&ev=PageView&noscript=1"/>
+    </noscript>
+    <!-- End Meta Pixel Code -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Selection and Total Calculator</title>
+    <script>
+        const products = {
+            "1001": { name: "Item 1", price: 500.00 },
+            "1002": { name: "Item 2", price: 1000.00 },
+            "1003": { name: "Item 3", price: 1500.00 },
+            "1004": { name: "Item 4", price: 2000.00 }
+        };
+
+        let total = 0;
+        
+        function addItem() {
+            const code = document.getElementById('item-code').value;
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            
+            if (products[code]) {
+                const item = products[code];
+                const cost = item.price * quantity;
+                total += cost;
+                
+                const listItem = document.createElement('li');
+                listItem.textContent = `${item.name} x${quantity} - ₱${cost.toFixed(2)}`;
+                document.getElementById('item-list').appendChild(listItem);
+                
+                document.getElementById('total').textContent = `Total: ₱${total.toFixed(2)}`;
+            } else {
+                alert("Invalid item code.");
+            }
+        }
+
+        function sendPixelEvent() {
+    if (typeof fbq !== "function") {
+        console.error("Meta Pixel (fbq) is not defined. Make sure the script is loaded.");
+        alert("Meta Pixel is not loaded. Please refresh the page.");
+        return;
+    }
+
+    const name = document.getElementById('customer-name').value;
+    const phone = document.getElementById('customer-phone').value;
+    const email = document.getElementById('customer-email').value;
+    const eventTime = Math.floor(Date.now() / 1000);
+
+    if (!name || !phone || !email) {
+        alert("Please fill out all fields.");
+        return;
+    }
+
+    const eventData = {
+        action_source: "website",
+        event_name: "CustomerRegistration",
+        event_time: eventTime,
+        event_id: "event-" + eventTime,
+        event_source_url: window.location.href,
+        user_data: {
+            em: email,  // Hashed email for Meta Pixel
+            ph: phone,  // Hashed phone number for Meta Pixel
+            madid: "",
+            client_ip_address: "",
+        },
+        custom_data: {
+            currency: "PHP",
+            value: total,
+            num_items: document.getElementById('item-list').children.length
+        },
+        app_data: {
+            advertiser_tracking_enabled: true,
+            application_tracking_enabled: true
+        }
+    };
+
+    // ✅ Send event to Meta Pixel
+    fbq('trackCustom', 'CustomerRegistration', eventData);
+    console.log("✅ Meta Pixel Event Sent:", eventData);
+
+    // ✅ Send event to Firebase
+    fetch('https://ytancodes.github.io/Grocery/EventsFirebaseMeta.html', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ data: [eventData] })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("✅ Firebase Event Sent:", data);
+        alert("Customer data sent to Meta and Firebase successfully!");
+    })
+    .catch(error => {
+        console.error("❌ Error sending event:", error);
+        alert("Failed to send customer data.");
+    });
+}
+
+    const name = document.getElementById('customer-name').value;
+    const phone = document.getElementById('customer-phone').value;
+    const email = document.getElementById('customer-email').value;
+    const eventTime = Math.floor(Date.now() / 1000);
+
+    if (!name || !phone || !email) {
+        alert("Please fill out all fields.");
+        return;
+    }
+
+    const eventData = {
+        data: [
+            {
+                action_source: "website",
+                event_name: "CustomerRegistration",
+                event_time: eventTime,
+                event_id: "event-" + eventTime,
+                event_source_url: window.location.href,
+                user_data: {
+                    madid: "",
+                    client_ip_address: "",
+                },
+                custom_data: {
+                    currency: "PHP",
+                    value: total,
+                    num_items: document.getElementById('item-list').children.length
+                },
+                app_data: {
+                    advertiser_tracking_enabled: true,
+                    application_tracking_enabled: true
+                }
+            }
+        ]
+    };
+
+    fetch('https://us-central1-onlinetabu-c6afd.cloudfunctions.net/storeEvent', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(eventData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Event Sent:", data);
+        alert("Customer data sent successfully!");
+    })
+    .catch(error => {
+        console.error("Error sending event:", error);
+        alert("Failed to send customer data.");
+    });
+}
+    </script>
+</head>
+<body>
+    <h1>Welcome to BrandX Grocery</h1>
+
+    <h2>Item Selection</h2>
+    <label for="item-code">Item Code:</label>
+    <input type="text" id="item-code">
+    <label for="quantity">Quantity:</label>
+    <input type="number" id="quantity" value="1" min="1">
+    <button onclick="addItem()">Add Item</button>
+    
+    <h2>Shopping List</h2>
+    <ul id="item-list"></ul>
+    <h3 id="total">Total: ₱0.00</h3>
+    
+    <h2>Customer Data Sheet</h2>
+    <form id="customer-form">
+        <label for="customer-name">Name:</label>
+        <input type="text" id="customer-name" required><br><br>
+        
+        <label for="customer-phone">Phone Number:</label>
+        <input type="tel" id="customer-phone" required><br><br>
+        
+        <label for="customer-email">Email:</label>
+        <input type="email" id="customer-email" required><br><br>
+        
+        <button type="button" onclick="sendPixelEvent()">Send Customer Event</button>
+    </form>
+</body>
+</html>
