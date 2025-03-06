@@ -75,7 +75,7 @@
         ]
     };
 
-    fetch('https://ytancodes.github.io/Grocery/OnlineTabu.html', {
+    fetch('https://console.firebase.google.com/project/onlinetabu-c6afd/overview', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -92,63 +92,7 @@
         alert("Failed to send customer data.");
     });
 }
-
-            const name = document.getElementById('customer-name').value;
-            const phone = document.getElementById('customer-phone').value;
-            const email = document.getElementById('customer-email').value;
-
-            if (!name || !phone || !email) {
-                alert("Please fill out all fields.");
-                return;
-            }
-
-            const eventData = {
-                event: "CustomerRegistration",
-                name: name,
-                phone: phone,
-                email: email
-            };
-
-            fbq('trackCustom', 'CustomerEvent', eventData);
-            alert('Customer data sent to Facebook Pixel!');
-        }
     </script>
-
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '625653913601966');
-    fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=625653913601966&ev=PageView&noscript=1"
-    /></noscript>
-    <!-- End Meta Pixel Code -->
-
-    <!-- Signals Gateway Pixel Code -->
-    <script>
-    !function(a,h,e,v,n,t,s)
-      {if(a.cbq)return;n=a.cbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!a._cbq)a._cbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=h.createElement(e);t.async=!0;
-      t.src=v;s=h.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://dn1ktoeflrkj1.cloudfront.net/sdk/5418180047227141104/events.js');
-      cbq('setHost', 'https://rpsa767kpp.us-west-2.awsapprunner.com/');
-      cbq('init', '3931969760411310');
-      cbq('setMetadata', '625653913601966'); // Updated Meta Dataset;
-      cbq('set', 'cookieDomain', 'https://ytancodes.github.io/Grocery/OnlineTabu.html');
-      cbq('track', 'PageView');
-    </script>
-    <!-- End Signals Gateway Pixel Code -->
 </head>
 <body>
     <h1>Welcome to BrandX Grocery</h1>
