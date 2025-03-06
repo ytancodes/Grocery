@@ -1,6 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    
+    fbq('init', '625653913601966'); // ✅ Replace with your actual Meta Pixel ID
+    fbq('track', 'PageView');
+    </script>
+    <noscript>
+        <img height="1" width="1" style="display:none"
+        src="https://www.facebook.com/tr?id=625653913601966&ev=PageView&noscript=1"/>
+    </noscript>
+    <!-- End Meta Pixel Code -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Item Selection and Total Calculator</title>
@@ -39,6 +58,62 @@
         alert("Meta Pixel is not loaded. Please refresh the page.");
         return;
     }
+
+    const name = document.getElementById('customer-name').value;
+    const phone = document.getElementById('customer-phone').value;
+    const email = document.getElementById('customer-email').value;
+    const eventTime = Math.floor(Date.now() / 1000);
+
+    if (!name || !phone || !email) {
+        alert("Please fill out all fields.");
+        return;
+    }
+
+    const eventData = {
+        action_source: "website",
+        event_name: "CustomerRegistration",
+        event_time: eventTime,
+        event_id: "event-" + eventTime,
+        event_source_url: window.location.href,
+        user_data: {
+            em: email,  // Hashed email for Meta Pixel
+            ph: phone,  // Hashed phone number for Meta Pixel
+            madid: "",
+            client_ip_address: "",
+        },
+        custom_data: {
+            currency: "PHP",
+            value: total,
+            num_items: document.getElementById('item-list').children.length
+        },
+        app_data: {
+            advertiser_tracking_enabled: true,
+            application_tracking_enabled: true
+        }
+    };
+
+    // ✅ Send event to Meta Pixel
+    fbq('trackCustom', 'CustomerRegistration', eventData);
+    console.log("✅ Meta Pixel Event Sent:", eventData);
+
+    // ✅ Send event to Firebase
+    fetch('https://us-central1-onlinetabu-c6afd.cloudfunctions.net/storeEvent', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ data: [eventData] })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("✅ Firebase Event Sent:", data);
+        alert("Customer data sent to Meta and Firebase successfully!");
+    })
+    .catch(error => {
+        console.error("❌ Error sending event:", error);
+        alert("Failed to send customer data.");
+    });
+}
 
     const name = document.getElementById('customer-name').value;
     const phone = document.getElementById('customer-phone').value;
