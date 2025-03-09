@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store XXX - Checkout</title>
+    <title>Checkout - Store XXX</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -37,84 +37,47 @@
         button:hover {
             background-color: #218838;
         }
-        input {
+        input, select {
             width: 100%;
             padding: 8px;
             margin: 5px 0;
             border-radius: 5px;
             border: 1px solid #ccc;
         }
+        .item-selection {
+            text-align: left;
+            margin-top: 10px;
+        }
     </style>
     <script>
-        let cart = [];
-
-        function addItem() {
-            const itemName = document.getElementById("item-name").value;
-            const quantity = parseInt(document.getElementById("quantity").value) || 1;
-            const price = parseFloat(document.getElementById("price").value) || 0;
-            
-            if (!itemName || price <= 0) {
-                alert("Please enter a valid item name and price.");
-                return;
-            }
-
-            const total = price * quantity;
-            cart.push(`${itemName} x${quantity} - ₱${total.toFixed(2)}`);
-
-            updateCart();
-        }
-
-        function updateCart() {
-            let cartList = document.getElementById("cart-list");
-            cartList.innerHTML = "";
-            let totalAmount = 0;
-
-            cart.forEach(item => {
-                const listItem = document.createElement("li");
-                listItem.textContent = item;
-                cartList.appendChild(listItem);
-                const match = item.match(/₱(\d+\.\d{2})/);
-                if (match) totalAmount += parseFloat(match[1]);
-            });
-
-            document.getElementById("total-amount").textContent = `Total Payable: ₱${totalAmount.toFixed(2)}`;
-        }
-
         function printInvoice() {
-            if (cart.length === 0) {
-                alert("No items in the cart. Add items before printing the invoice.");
-                return;
-            }
-
+            const items = Array.from(document.querySelectorAll('#item-list li')).map(item => item.textContent);
+            const cashReceived = parseFloat(document.getElementById('cash-received').value) || 0;
+            const totalPayableMatch = document.getElementById('total').textContent.match(/₱\d+\.\d{2}/);
+            const totalPayable = totalPayableMatch ? parseFloat(totalPayableMatch[0].slice(1)) : 0;
+            const change = cashReceived - totalPayable;
+            
             const invoiceDetails = {
-                items: cart,
-                totalPayable: parseFloat(document.getElementById("total-amount").textContent.replace("Total Payable: ₱", ""))
+                items,
+                cashReceived,
+                change,
+                totalPayable
             };
-
+            
             const invoiceUrl = `generate_invoice.html?data=${encodeURIComponent(JSON.stringify(invoiceDetails))}`;
-            window.location.href = invoiceUrl;
+            window.open(invoiceUrl, "_blank");
         }
     </script>
 </head>
 <body>
     <div class="checkout-container">
         <h1>Welcome to Store XXX</h1>
+        <p id="current-date"></p>
         
-        <label for="item-name">Item Name:</label>
-        <input type="text" id="item-name" placeholder="Enter item name">
-        
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" value="1" min="1">
-        
-        <label for="price">Price per Item (₱):</label>
-        <input type="number" id="price" step="0.01">
-        
-        <button onclick="addItem()">Add to Cart</button>
-        
-        <h2>Cart</h2>
-        <ul id="cart-list"></ul>
-        <p id="total-amount">Total Payable: ₱0.00</p>
-        
+        <label for="cash-received">Cash Received (₱):</label>
+        <input type="number" id="cash-received" step="0.01">
+        <button onclick="calculateChange()">Calculate Change</button>
+        <div id="change">Change: ₱0.00</div>
         <button onclick="printInvoice()">Print Invoice</button>
     </div>
 </body>
