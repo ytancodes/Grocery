@@ -151,6 +151,16 @@
     cbq('track', 'PageView');
   </script>
     <!-- End Signals Gateway Pixel Code -->
+
+<!-- Service Worker Code -->
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log("Service Worker Registered"));
+  }
+  </script>
+<!-- Service Worker Code -->
+	
 </head>
 <body>
     <h1>Welcome to BrandX Grocery BIR TIN 12345534</h1>
