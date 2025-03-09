@@ -88,17 +88,23 @@
             const totalPayableMatch = document.getElementById('total').textContent.match(/₱\d+\.\d{2}/);
             const totalPayable = totalPayableMatch ? parseFloat(totalPayableMatch[0].slice(1)) : 0;
             const change = cashReceived - totalPayable;
-            
+        
+            if (items.length === 0 || isNaN(cashReceived) || isNaN(change) || isNaN(totalPayable)) {
+                alert("No invoice details found. Please complete the transaction first.");
+                return;
+            }
+        
             const invoiceDetails = {
                 items,
                 cashReceived,
                 change,
                 totalPayable
             };
-            
+        
             const invoiceUrl = `generate_invoice.html?data=${encodeURIComponent(JSON.stringify(invoiceDetails))}`;
             window.open(invoiceUrl, "_blank");
         }
+
     </script>
 </head>
 <body>
