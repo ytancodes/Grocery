@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
@@ -14,7 +14,7 @@
             "1004": { name: "Item 4", price: 2000.00 }
         };
 
-        const conversionRate = 50; // 1 USD = 50 PHP
+        const conversionRate = 50;
         let cashOnHand = 0;
 
         function setCashOnHand() {
@@ -105,8 +105,23 @@
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
-                .then(() => console.log('Service Worker Registered'))
+                .then(reg => {
+                    console.log('Service Worker Registered');
+                    if ('sync' in reg) {
+                        reg.sync.register('background-sync');
+                    }
+                })
                 .catch(err => console.error('Service Worker Registration Failed:', err));
+        }
+
+        if ('Notification' in window && navigator.serviceWorker) {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    navigator.serviceWorker.ready.then(reg => {
+                        reg.showNotification('Welcome to OnlineTabu!');
+                    });
+                }
+            });
         }
     </script>
 </body>
