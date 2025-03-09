@@ -74,25 +74,18 @@
         }
 
         function calculateChange() {
-            // Capture invoice details
-            const items = Array.from(document.querySelectorAll('#item-list li')).map(item => item.textContent);
             const cashReceived = parseFloat(document.getElementById('cash-received').value) || 0;
             const totalPayableMatch = document.getElementById('total').textContent.match(/₱\d+\.\d{2}/);
             const totalPayable = totalPayableMatch ? parseFloat(totalPayableMatch[0].slice(1)) : 0;
+            
             const change = cashReceived - totalPayable;
             document.getElementById('change').textContent = 'Change: ₱' + change.toFixed(2);
-        
-            // Open the generate_invoice.html page with invoice details as URL parameters
-            const invoiceDetails = {
-                items,
-                cashReceived,
-                change,
-                totalPayable
-            };
-            const invoiceUrl = `generate_invoice.html?data=${encodeURIComponent(JSON.stringify(invoiceDetails))}`;
-            window.open(invoiceUrl, '_blank');
         }
 
+        function printInvoice() {
+            const invoiceUrl = "generate_invoice.html";
+            window.open(invoiceUrl, "_blank");
+        }
     </script>
 </head>
 <body>
@@ -114,27 +107,6 @@
     <input type="number" id="cash-received" step="0.01">
     <button onclick="calculateChange()">Calculate Change</button><br><br>
     <div id="change">Change: ₱0.00</div>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => {
-                    console.log('Service Worker Registered');
-                    if ('sync' in reg) {
-                        reg.sync.register('background-sync');
-                    }
-                })
-                .catch(err => console.error('Service Worker Registration Failed:', err));
-        }
-
-        if ('Notification' in window && navigator.serviceWorker) {
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    navigator.serviceWorker.ready.then(reg => {
-                        reg.showNotification('Welcome to OnlineTabu!');
-                    });
-                }
-            });
-        }
-    </script>
+    <button onclick="printInvoice()">Print Invoice</button><br><br>
 </body>
 </html>
