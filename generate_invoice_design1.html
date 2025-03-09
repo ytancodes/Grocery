@@ -80,8 +80,6 @@
                 invoiceText += item.textContent + "\n";
             });
             invoiceText += "\nTotal: " + document.getElementById('total').textContent;
-            invoiceText += "\nCash Received: " + document.getElementById('cash-received').value;
-            invoiceText += "\nChange: " + document.getElementById('change').textContent;
             return invoiceText;
         }
     </script>
@@ -94,8 +92,6 @@
         <div id="invoice-details">
             <ul id="item-list"></ul>
             <p id="total">Total Payable: ₱0.00</p>
-            <p>Cash Received: <span id="cash-received-display">₱0.00</span></p>
-            <p id="change">Change: ₱0.00</p>
         </div>
         
         <button onclick="printInvoice()">Print Invoice</button>
