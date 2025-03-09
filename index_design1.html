@@ -50,6 +50,13 @@
         }
     </style>
     <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker Registered'))
+                .catch(err => console.error('Service Worker Registration Failed:', err));
+        }
+    </script>
+    <script>
         const products = {
             "1001": { name: "Item 1", price: 500.00 },
             "1002": { name: "Item 2", price: 1000.00 },
@@ -114,33 +121,6 @@
                 }
             });
             document.getElementById('total').textContent = 'Total Payable: ₱' + total.toFixed(2);
-        }
-
-        function calculateChange() {
-            const cashReceived = parseFloat(document.getElementById('cash-received').value) || 0;
-            const totalPayableMatch = document.getElementById('total').textContent.match(/₱\d+\.\d{2}/);
-            const totalPayable = totalPayableMatch ? parseFloat(totalPayableMatch[0].slice(1)) : 0;
-            
-            const change = cashReceived - totalPayable;
-            document.getElementById('change').textContent = 'Change: ₱' + change.toFixed(2);
-        }
-
-        function printInvoice() {
-            const items = Array.from(document.querySelectorAll('#item-list li')).map(item => item.textContent);
-            const cashReceived = parseFloat(document.getElementById('cash-received').value) || 0;
-            const totalPayableMatch = document.getElementById('total').textContent.match(/₱\d+\.\d{2}/);
-            const totalPayable = totalPayableMatch ? parseFloat(totalPayableMatch[0].slice(1)) : 0;
-            const change = cashReceived - totalPayable;
-            
-            const invoiceDetails = {
-                items,
-                cashReceived,
-                change,
-                totalPayable
-            };
-            
-            const invoiceUrl = `generate_invoice.html?data=${encodeURIComponent(JSON.stringify(invoiceDetails))}`;
-            window.open(invoiceUrl, "_blank");
         }
     </script>
 </head>
