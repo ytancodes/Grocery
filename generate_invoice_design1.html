@@ -49,6 +49,30 @@
         }
     </style>
     <script>
+        function getQueryParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const data = urlParams.get("data");
+            return data ? JSON.parse(decodeURIComponent(data)) : null;
+        }
+
+        function displayInvoice() {
+            const invoiceData = getQueryParams();
+            if (!invoiceData || !invoiceData.items || invoiceData.items.length === 0) {
+                document.getElementById("invoice-details").innerHTML = "<p>No invoice details found.</p>";
+                return;
+            }
+
+            let invoiceHTML = "<ul>";
+            invoiceData.items.forEach(item => {
+                invoiceHTML += `<li>${item}</li>`;
+            });
+            invoiceHTML += "</ul>";
+
+            invoiceHTML += `<p><strong>Total Payable:</strong> ₱${invoiceData.totalPayable.toFixed(2)}</p>`;
+            
+            document.getElementById("invoice-details").innerHTML = invoiceHTML;
+        }
+
         function printInvoice() {
             window.print();
         }
@@ -75,13 +99,18 @@
         }
 
         function generateInvoiceContent() {
+            const invoiceData = getQueryParams();
+            if (!invoiceData) return "No invoice details found.";
+
             let invoiceText = "Invoice Details:\n";
-            document.querySelectorAll('#item-list li').forEach(item => {
-                invoiceText += item.textContent + "\n";
+            invoiceData.items.forEach(item => {
+                invoiceText += item + "\n";
             });
-            invoiceText += "\nTotal: " + document.getElementById('total').textContent;
+            invoiceText += `\nTotal Payable: ₱${invoiceData.totalPayable.toFixed(2)}`;
             return invoiceText;
         }
+
+        window.onload = displayInvoice;
     </script>
 </head>
 <body>
@@ -89,10 +118,7 @@
         <h1>Invoice - Store XXX</h1>
         <p id="current-date"></p>
         
-        <div id="invoice-details">
-            <ul id="item-list"></ul>
-            <p id="total">Total Payable: ₱0.00</p>
-        </div>
+        <div id="invoice-details"></div>
         
         <button onclick="printInvoice()">Print Invoice</button>
         
