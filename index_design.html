@@ -71,7 +71,7 @@
             const item = products[selectedCode];
             
             if (item) {
-                addItem(item);
+                showQuantityInput(item);
             } else {
                 alert('No item found. Please enter a correct code.');
             }
@@ -81,16 +81,26 @@
             const selectedRadio = document.querySelector('input[name="item"]:checked');
             if (selectedRadio) {
                 const item = products[selectedRadio.value];
-                addItem(item);
+                showQuantityInput(item);
             } else {
                 alert('Please select an item to add.');
             }
         }
 
-        function addItem(item) {
+        function showQuantityInput(item) {
+            document.getElementById('item-details').innerHTML = `
+                <p>${item.name} - ₱${item.price.toFixed(2)}</p>
+                <label for="quantity">Quantity: </label>
+                <input type="number" id="quantity" value="1" min="1">
+                <button onclick="addItem('${item.name}', ${item.price})">Add to Cart</button>
+            `;
+        }
+
+        function addItem(name, price) {
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
             const itemList = document.getElementById('item-list');
             const listItem = document.createElement('li');
-            listItem.textContent = `${item.name} - ₱${item.price.toFixed(2)}`;
+            listItem.textContent = `${name} x${quantity} - ₱${(price * quantity).toFixed(2)}`;
             itemList.appendChild(listItem);
             updateTotal();
         }
@@ -116,7 +126,21 @@
         }
 
         function printInvoice() {
-            window.print();
+            const items = Array.from(document.querySelectorAll('#item-list li')).map(item => item.textContent);
+            const cashReceived = parseFloat(document.getElementById('cash-received').value) || 0;
+            const totalPayableMatch = document.getElementById('total').textContent.match(/₱\d+\.\d{2}/);
+            const totalPayable = totalPayableMatch ? parseFloat(totalPayableMatch[0].slice(1)) : 0;
+            const change = cashReceived - totalPayable;
+            
+            const invoiceDetails = {
+                items,
+                cashReceived,
+                change,
+                totalPayable
+            };
+            
+            const invoiceUrl = `generate_invoice.html?data=${encodeURIComponent(JSON.stringify(invoiceDetails))}`;
+            window.open(invoiceUrl, "_blank");
         }
     </script>
 </head>
@@ -134,15 +158,8 @@
         <input type="text" id="code" maxlength="4">
         <button onclick="findItem()">Find Item</button>
 
-        <div class="item-selection">
-            <p>Select an Item:</p>
-            <input type="radio" name="item" value="1001"> Item 1 - ₱500.00<br>
-            <input type="radio" name="item" value="1002"> Item 2 - ₱1000.00<br>
-            <input type="radio" name="item" value="1003"> Item 3 - ₱1500.00<br>
-            <input type="radio" name="item" value="1004"> Item 4 - ₱2000.00<br>
-            <button onclick="selectRadioItem()">Add Selected Item</button>
-        </div>
-
+        <div class="item-selection" id="item-details"></div>
+        
         <ul id="item-list"></ul>
         <div id="total">Total Payable: ₱0.00</div>
 
