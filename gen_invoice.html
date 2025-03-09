@@ -46,37 +46,48 @@
         function getQueryParams() {
             const urlParams = new URLSearchParams(window.location.search);
             const data = urlParams.get("data");
-            return data ? JSON.parse(decodeURIComponent(data)) : null;
+        
+            if (!data) {
+                document.getElementById("invoice-details").innerHTML = "<p>No invoice details found.</p>";
+                return null;
+            }
+        
+            try {
+                return JSON.parse(decodeURIComponent(data));
+            } catch (error) {
+                console.error("Error parsing invoice data:", error);
+                document.getElementById("invoice-details").innerHTML = "<p>Invalid invoice data.</p>";
+                return null;
+            }
         }
-
+        
         function displayInvoice() {
             const invoiceData = getQueryParams();
-            if (!invoiceData || !invoiceData.items || invoiceData.items.length === 0) {
-                document.getElementById("invoice-details").innerHTML = "<p>No invoice details found.</p>";
-                return;
-            }
-
+            if (!invoiceData) return;
+        
             let invoiceHTML = "<h2>Items Purchased:</h2><ul>";
             invoiceData.items.forEach(item => {
                 invoiceHTML += `<li>${item}</li>`;
             });
             invoiceHTML += "</ul>";
-
+        
             invoiceHTML += `<p><strong>Total Payable:</strong> ₱${invoiceData.totalPayable.toFixed(2)}</p>`;
             invoiceHTML += `<p><strong>Cash Received:</strong> ₱${invoiceData.cashReceived.toFixed(2)}</p>`;
             invoiceHTML += `<p><strong>Change:</strong> ₱${invoiceData.change.toFixed(2)}</p>`;
-
+        
             document.getElementById("invoice-details").innerHTML = invoiceHTML;
         }
-
-        function printInvoice() {
-            window.print();
-        }
-
+        
+        // Display the invoice and date on page load
         window.onload = function () {
             displayInvoice();
             document.getElementById("current-date-time").textContent = new Date().toLocaleString();
         };
+        
+        function printInvoice() {
+            window.print();
+        }
+
     </script>
 </body>
 </html>
