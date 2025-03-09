@@ -83,7 +83,20 @@
         }
 
         function printInvoice() {
-            const invoiceUrl = "generate_invoice.html";
+            const items = Array.from(document.querySelectorAll('#item-list li')).map(item => item.textContent);
+            const cashReceived = parseFloat(document.getElementById('cash-received').value) || 0;
+            const totalPayableMatch = document.getElementById('total').textContent.match(/₱\d+\.\d{2}/);
+            const totalPayable = totalPayableMatch ? parseFloat(totalPayableMatch[0].slice(1)) : 0;
+            const change = cashReceived - totalPayable;
+            
+            const invoiceDetails = {
+                items,
+                cashReceived,
+                change,
+                totalPayable
+            };
+            
+            const invoiceUrl = `generate_invoice.html?data=${encodeURIComponent(JSON.stringify(invoiceDetails))}`;
             window.open(invoiceUrl, "_blank");
         }
     </script>
