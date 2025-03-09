@@ -5,7 +5,7 @@
     <meta name="theme-color" content="#000000">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - Store XXX</title>
+    <title>Invoice - Store XXX</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,7 +13,7 @@
             text-align: center;
             padding: 20px;
         }
-        .checkout-container {
+        .invoice-container {
             background: white;
             padding: 20px;
             border-radius: 10px;
@@ -37,22 +37,22 @@
         button:hover {
             background-color: #218838;
         }
-        input, select {
+        input {
             width: 100%;
             padding: 8px;
             margin: 5px 0;
             border-radius: 5px;
             border: 1px solid #ccc;
         }
-        .item-selection {
-            text-align: left;
-            margin-top: 10px;
-        }
         .hidden {
             display: none;
         }
     </style>
     <script>
+        function printInvoice() {
+            window.print();
+        }
+
         function validateEmail(email) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
@@ -87,14 +87,17 @@
     </script>
 </head>
 <body>
-    <div class="checkout-container">
-        <h1>Welcome to Store XXX</h1>
+    <div class="invoice-container">
+        <h1>Invoice - Store XXX</h1>
         <p id="current-date"></p>
         
-        <label for="cash-received">Cash Received (₱):</label>
-        <input type="number" id="cash-received" step="0.01">
-        <button onclick="calculateChange()">Calculate Change</button>
-        <div id="change">Change: ₱0.00</div>
+        <div id="invoice-details">
+            <ul id="item-list"></ul>
+            <p id="total">Total Payable: ₱0.00</p>
+            <p>Cash Received: <span id="cash-received-display">₱0.00</span></p>
+            <p id="change">Change: ₱0.00</p>
+        </div>
+        
         <button onclick="printInvoice()">Print Invoice</button>
         
         <button onclick="toggleEmailField()">Send Invoice to Email</button>
