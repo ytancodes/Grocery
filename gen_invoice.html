@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        .header {
+            text-align: left;
+            margin-left: 20px;
+        }
+        .bir-tin {
+            text-align: left;
+            margin-left: 20px;
+        }
+        .date-time {
+            text-align: left;
+            margin-left: 20px;
+        }
+        .items {
+            text-align: left;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>BrandX Grocery Sales Invoice</h1>
+    </div>
+    <div class="bir-tin">
+        <p>BIR TIN: 23433444</p>
+    </div>
+    <div class="date-time">
+        <p>Date and Time: <span id="current-date-time"></span></p>
+    </div>
+
+    <div class="items">
+        <div id="invoice-details">
+            <!-- JavaScript will populate this section -->
+        </div>
+    </div>
+    
+    <button onclick="printInvoice()">Print Invoice</button>
+
+    <script>
+        function getQueryParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const data = urlParams.get("data");
+            return data ? JSON.parse(decodeURIComponent(data)) : null;
+        }
+
+        function displayInvoice() {
+            const invoiceData = getQueryParams();
+            if (!invoiceData || !invoiceData.items || invoiceData.items.length === 0) {
+                document.getElementById("invoice-details").innerHTML = "<p>No invoice details found.</p>";
+                return;
+            }
+
+            let invoiceHTML = "<h2>Items Purchased:</h2><ul>";
+            invoiceData.items.forEach(item => {
+                invoiceHTML += `<li>${item}</li>`;
+            });
+            invoiceHTML += "</ul>";
+
+            invoiceHTML += `<p><strong>Total Payable:</strong> ₱${invoiceData.totalPayable.toFixed(2)}</p>`;
+            invoiceHTML += `<p><strong>Cash Received:</strong> ₱${invoiceData.cashReceived.toFixed(2)}</p>`;
+            invoiceHTML += `<p><strong>Change:</strong> ₱${invoiceData.change.toFixed(2)}</p>`;
+
+            document.getElementById("invoice-details").innerHTML = invoiceHTML;
+        }
+
+        function printInvoice() {
+            window.print();
+        }
+
+        window.onload = function () {
+            displayInvoice();
+            document.getElementById("current-date-time").textContent = new Date().toLocaleString();
+        };
+    </script>
+</body>
+</html>
